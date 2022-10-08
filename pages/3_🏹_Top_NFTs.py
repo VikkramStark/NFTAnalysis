@@ -97,7 +97,7 @@ display_size = int(display_size_input) if display_size_input else display_size
 pointer = 0 
 while track < display_size and display_size < 500: 
     logo = top_collection['Logo'][pointer] 
-    if(type(logo) == str and logo.endswith('jpg')):  
+    if(type(logo) == str and logo.endswith('jpg')):   
         #if(logo.endswith('png')):
         #    logo.replace('png','jpg')     
         track += 1 

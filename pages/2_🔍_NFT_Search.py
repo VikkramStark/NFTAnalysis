@@ -5,6 +5,15 @@ import json
 
 st.set_page_config(layout = "wide") 
 
+# st.markdown("""
+#     <style>
+#         .e1tzin5v0{ 
+#             width:70%;  
+#             display:grid;  
+#             grid-template-columns: 1fr 1fr;   
+#         } 
+#     </style> 
+# """,unsafe_allow_html=True) 
 
 #<==============================>     VENLY POSTMAN AUTHENTICATIOn    <=======================================>   
 
@@ -189,14 +198,56 @@ if endpoint == 'Wallet Address':
             </div>
         """,unsafe_allow_html = True)
 
+
+#<============================> Query Search <=====================================>
+
+def format_query(result):
+
+    token_id = result['token_id'] 
+    token_address = result['token_address'] 
+    metadata = json.loads(result['metadata']) 
+    description = metadata['description'][:500] if 'description' in metadata else None 
+    name = metadata['name'] 
+    image = metadata['image']  
+    ref_url = metadata['external_url'] if 'external_url' in metadata else None
+    block_number = result['block_number_minted'] 
+    contract_type = result['contract_type'] 
+
+    st = f"""
+        <div class = 'container' style = "display:flex; flex-direction:column; justify-content:center; padding:20px; border:2px solid white; gap:30px; border-radius: 20px; width:50%; transform:translateX(25%); margin:50px">          
+            <header style = "width:100%; display:flex; align-items:center; justify-content:center; ">
+                <h2 style = "text-align:center; word-wrap:break-word">{name}</h2>   
+            </header>
+            <div class = 'disp' style = "display:flex; flex-direction:column; justify-content:space-around; align-items:center">    
+                <img src="{image}" width="300px" style = "border:2px solid white; border-radius:20px; margin:30px ">       
+                <span style="word-wrap:break-word; width:100%; text-align:center; font-size:20px">    
+                    {description if description !=None else 'No Description, Just see the Image 😛'}.....  
+                </span> 
+            </div> 
+            <div style = "display:flex; align-items:center; flex-direction:column; justify-content:space-around; width:100%">  
+                <span style = "font-size:30px">Block Number : <i>{block_number}</i></span>  
+                <span style = "font-style:30px">Contract Type : <b>{contract_type}</b></span> 
+            </div> 
+            <a href = "{ref_url if ref_url != None else '/NFT_View'}" style = "word-wrap:break-word; text-align:center; width:100%; font-size:20px; display:flex; justify-items:center">{str(ref_url) if ref_url != None else 'No Reference URL for this one'}</a>  
+        </div>
+    """ 
+
+    return st 
+
+
+
 if endpoint == 'Query Search':
     q = st.text_input('Enter Query Srting to search NFT') 
     if(q and not q.isspace()):
         q = q.replace(' ','%20') 
         URL = f'https://deep-index.moralis.io/api/v2/nft/search?chain=eth&format=decimal&q={q}&filter=name' 
-        response = requests.get(URL,headers = moralis_headers).json()
-        length = len(response['result'])  
-        st.write(response) 
+        response = requests.get(URL,headers = moralis_headers).json() 
+        #st.write(response['result'])  
+        for result in response['result']:
+            try:
+                st.markdown(format_query(result),unsafe_allow_html=True) 
+            except:
+                pass 
     else:
         st.markdown("""
             <div style = "display:flex; align-items:center;justify-content:space-between;flex-direction:column; padding:20px; margin-top:10% ; min-height:50%; gap:40px">    
@@ -205,15 +256,6 @@ if endpoint == 'Query Search':
                 <h5 style = "letter-spacing:2px"><i>Query : <u>Bored Ape</u></i></h5></h3> 
             </div>
         """,unsafe_allow_html = True)
-
-
-
-
-
-
-
-
-
 
 
     
